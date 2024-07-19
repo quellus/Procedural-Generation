@@ -11,21 +11,21 @@ const NUM_ROOMS = 5
 func _ready():
 	generate_dungeon()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+func _input(event):
+	if event.is_action_pressed("ui_accept"):
+		generate_dungeon()
 
 func generate_dungeon():
-	var dungeon_floor = []
-	var dungeon = BSP.new_bsp(Vector2.ZERO, Vector2(DUNGEON_SIZE, DUNGEON_SIZE))
-	dungeon.split(3)
+	tilemap.clear()
+	var dungeon = BSP.create_bsp(Vector2.ZERO, Vector2(DUNGEON_SIZE, DUNGEON_SIZE))
+	dungeon.split(1)
 	var rooms := dungeon.get_rooms()
-	print(rooms)
+	rooms.append_array(dungeon.generate_hallways())
 	for room in rooms:
-		for x in range(room.start.x, room.end.x):
-			for y in range(room.start.y, room.end.y):
+		var dungeon_floor = []
+		tilemap.add_layer(-1)
+		for x in range(room.position.x, room.end.x):
+			for y in range(room.position.y, room.end.y):
 				dungeon_floor.append(Vector2i(x,y))
-	tilemap.set_cells_terrain_connect(0, dungeon_floor, 0, 0)
-	pass
+		tilemap.set_cells_terrain_connect(-1, dungeon_floor, 0, 0)
 	
